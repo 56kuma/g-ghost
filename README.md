@@ -1,5 +1,125 @@
 # Ghost ブログ環境
 
+Dockerを使用したGhostブログの開発環境と、ヘッドレスCMSとして使用するためのフロントエンドアプリケーションです。
+
+## プロジェクト概要
+
+このリポジトリには以下の2つのコンポーネントが含まれています：
+
+1. **Ghost CMS (Docker環境)**: バックエンドのコンテンツ管理システム
+2. **ヘッドレスフロントエンド**: Ghost Content APIを使用したカード型ブログデザイン
+
+---
+
+## 📱 ヘッドレスCMSフロントエンド
+
+GhostをヘッドレスCMSとして使用し、Content APIから投稿を取得してカード形式で表示するシンプルなWebアプリケーションです。
+
+### 技術スタック
+
+- HTML5
+- CSS3 (カスタムプロパティ、Grid、Flexbox)
+- TypeScript
+
+### ファイル構成
+
+```
+g_ghost/
+├── index.html          # メインHTMLファイル
+├── styles.css          # スタイルシート（カードデザイン）
+├── main.ts             # TypeScriptファイル（Ghost API連携）
+├── main.js             # コンパイル済みJavaScript
+├── package.json        # npm設定
+├── tsconfig.json       # TypeScript設定
+└── ...
+```
+
+### セットアップ手順
+
+#### 1. 依存関係のインストール
+
+```bash
+npm install
+```
+
+#### 2. Ghost APIの設定
+
+`main.ts` ファイルの設定を編集します：
+
+```typescript
+const config: GhostConfig = {
+    url: 'https://demo.ghost.io',          // あなたのGhost URLに変更
+    key: '22444f78447824223cefc48062',     // Content API Keyに変更
+    version: 'v5.0'
+};
+```
+
+**Content API Keyの取得方法**:
+1. Ghost管理画面 (http://localhost:2368/ghost) にログイン
+2. **Settings** → **Integrations** → **Add custom integration**
+3. 統合名を入力して作成
+4. **Content API Key** をコピー
+
+#### 3. TypeScriptのコンパイル
+
+```bash
+npm run build
+```
+
+または、自動監視モード：
+
+```bash
+npm run watch
+```
+
+#### 4. 開発サーバーの起動
+
+```bash
+npm run serve
+```
+
+ブラウザで http://localhost:8080 にアクセスします。
+
+### 機能
+
+- ✨ モダンなカードデザイン
+- 📱 完全レスポンシブ対応
+- 🎨 カスタマイズ可能なデザイン（CSS変数）
+- 🏷️ タグ表示
+- 👤 著者情報表示
+- 📖 読了時間表示
+- 🖼️ アイキャッチ画像サポート
+- ⚡ ローディング状態表示
+- 🔒 XSS対策（HTMLエスケープ）
+
+### カスタマイズ
+
+#### デザインのカスタマイズ
+
+`styles.css` のCSS変数を変更することで、簡単にデザインをカスタマイズできます：
+
+```css
+:root {
+    --primary-color: #3b82f6;      /* メインカラー */
+    --background-color: #f8fafc;   /* 背景色 */
+    --card-background: #ffffff;    /* カード背景色 */
+    --text-primary: #1e293b;       /* テキストカラー */
+    /* ... */
+}
+```
+
+#### 投稿数の変更
+
+`main.ts` の `init()` メソッドで取得する投稿数を変更できます：
+
+```typescript
+const posts = await this.fetchPosts(12); // 12を任意の数に変更
+```
+
+---
+
+## 🐳 Ghost CMSバックエンド (Docker)
+
 Dockerを使用したGhostブログの開発環境です。
 
 ## 必要な環境

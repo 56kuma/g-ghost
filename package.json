@@ -1,0 +1,23 @@
+{
+  "name": "ghost-cms-blog",
+  "version": "1.0.0",
+  "description": "Ghost CMS headless blog with card design",
+  "main": "main.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "serve": "npx http-server -p 8080"
+  },
+  "keywords": [
+    "ghost",
+    "cms",
+    "headless",
+    "blog",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}
