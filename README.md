@@ -48,8 +48,8 @@ npm install
 
 ```typescript
 const config: GhostConfig = {
-    url: 'https://demo.ghost.io',          // あなたのGhost URLに変更
-    key: '22444f78447824223cefc48062',     // Content API Keyに変更
+    url: 'http://localhost:2368',          // あなたのGhost URLに変更
+    key: '691bd2d288c7e2579ff1c4865a',     // Content API Keyに変更
     version: 'v5.0'
 };
 ```
