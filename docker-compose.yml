@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  ghost:
+    image: ghost:5-alpine
+    container_name: ghost
+    restart: always
+    ports:
+      - "2368:2368"
+    environment:
+      # データベース設定
+      database__client: mysql
+      database__connection__host: db
+      database__connection__user: ghost
+      database__connection__password: ghostpassword
+      database__connection__database: ghostdb
+      # Ghost設定
+      url: http://localhost:2368
+      NODE_ENV: development
+    volumes:
+      - ghost_content:/var/lib/ghost/content
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: ghost_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: ghostdb
+      MYSQL_USER: ghost
+      MYSQL_PASSWORD: ghostpassword
+    volumes:
+      - ghost_db:/var/lib/mysql
+
+volumes:
+  ghost_content:
+  ghost_db:
