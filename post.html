@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>記事 | Ghost CMS Blog</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="post-styles.css">
+</head>
+<body class="post-page">
+    <header class="post-header">
+        <div class="container">
+            <a href="index.html" class="back-link">← ブログに戻る</a>
+        </div>
+    </header>
+
+    <main class="post-main">
+        <div class="container">
+            <div id="loading" class="loading">
+                <div class="spinner earth"></div>
+                <p>記事を読み込んでいます...</p>
+            </div>
+
+            <div id="error" class="error" style="display: none;">
+                <p class="error-message"></p>
+            </div>
+
+            <article id="post-content" class="post-article" style="display: none;">
+                <div class="post-hero">
+                    <img id="post-image" src="" alt="" class="post-hero-image">
+                </div>
+                <div class="post-body">
+                    <div id="post-tags" class="post-tags"></div>
+                    <h1 id="post-title" class="post-title"></h1>
+                    <div id="post-meta" class="post-meta"></div>
+                    <div id="post-html" class="post-content"></div>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <footer class="post-footer">
+        <div class="container">
+            <p>&copy; 2025 Ghost CMS Blog. Powered by Ghost.</p>
+        </div>
+    </footer>
+
+    <script src="post.js"></script>
+</body>
+</html>

@@ -48,7 +48,7 @@ class GhostBlog {
         const card = document.createElement('article');
         card.className = 'post-card';
         card.onclick = () => {
-            window.open(`${this.config.url}/${post.slug}`, '_blank');
+            window.location.href = `post.html?slug=${post.slug}`;
         };
         // Feature image or placeholder
         const imageUrl = post.feature_image || 'https://via.placeholder.com/400x220/667eea/ffffff?text=No+Image';
