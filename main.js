@@ -7,17 +7,42 @@ const config = {
 };
 class GhostBlog {
     constructor(config) {
+        this.selectedTag = null;
         this.config = config;
         this.postsContainer = document.getElementById('posts-container');
         this.loadingElement = document.getElementById('loading');
         this.errorElement = document.getElementById('error');
+        this.tagsContainer = document.getElementById('tags-container');
+    }
+    /**
+     * Fetch tags from Ghost Content API
+     */
+    async fetchTags() {
+        try {
+            const url = `${this.config.url}/ghost/api/content/tags/?key=${this.config.key}&limit=all&include=count.posts`;
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            // Filter tags that have at least one post
+            return data.tags.filter(tag => tag.count && tag.count.posts > 0);
+        }
+        catch (error) {
+            console.error('Error fetching tags:', error);
+            throw error;
+        }
     }
     /**
      * Fetch posts from Ghost Content API
      */
-    async fetchPosts(limit = 12) {
+    async fetchPosts(limit = 12, tagSlug) {
         try {
-            const url = `${this.config.url}/ghost/api/content/posts/?key=${this.config.key}&limit=${limit}&include=tags,authors&fields=id,title,slug,excerpt,custom_excerpt,feature_image,published_at,reading_time`;
+            let url = `${this.config.url}/ghost/api/content/posts/?key=${this.config.key}&limit=${limit}&include=tags,authors&fields=id,title,slug,excerpt,custom_excerpt,feature_image,published_at,reading_time`;
+            // Add tag filter if specified
+            if (tagSlug) {
+                url += `&filter=tag:${tagSlug}`;
+            }
             const response = await fetch(url);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -137,7 +162,7 @@ class GhostBlog {
             this.postsContainer.innerHTML = `
                 <div class="no-posts">
                     <h2>投稿が見つかりませんでした</h2>
-                    <p>まだ投稿がありません。</p>
+                    <p>${this.selectedTag ? '選択したタグの投稿がありません。' : 'まだ投稿がありません。'}</p>
                 </div>
             `;
             return;
@@ -149,12 +174,57 @@ class GhostBlog {
         });
     }
     /**
+     * Render tags filter
+     */
+    renderTags(tags) {
+        if (!this.tagsContainer) {
+            return;
+        }
+        const container = this.tagsContainer;
+        container.innerHTML = '';
+        // Add "All" tag
+        const allTag = document.createElement('button');
+        allTag.className = `tag-filter ${!this.selectedTag ? 'active' : ''}`;
+        allTag.textContent = 'すべて';
+        allTag.onclick = () => this.filterByTag(null);
+        container.appendChild(allTag);
+        // Add individual tags
+        tags.forEach(tag => {
+            const tagButton = document.createElement('button');
+            tagButton.className = `tag-filter ${this.selectedTag === tag.slug ? 'active' : ''}`;
+            tagButton.textContent = `${tag.name} (${tag.count?.posts || 0})`;
+            tagButton.onclick = () => this.filterByTag(tag.slug);
+            container.appendChild(tagButton);
+        });
+    }
+    /**
+     * Filter posts by tag
+     */
+    async filterByTag(tagSlug) {
+        this.selectedTag = tagSlug;
+        try {
+            this.showLoading();
+            const posts = await this.fetchPosts(12, tagSlug || undefined);
+            const tags = await this.fetchTags();
+            this.renderTags(tags);
+            this.renderPosts(posts);
+        }
+        catch (error) {
+            console.error('Failed to filter posts:', error);
+            this.showError('投稿のフィルタリングに失敗しました。');
+        }
+    }
+    /**
      * Initialize the blog
      */
     async init() {
         try {
             this.showLoading();
-            const posts = await this.fetchPosts();
+            const [posts, tags] = await Promise.all([
+                this.fetchPosts(),
+                this.fetchTags()
+            ]);
+            this.renderTags(tags);
             this.renderPosts(posts);
         }
         catch (error) {
