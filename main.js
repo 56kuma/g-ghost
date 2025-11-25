@@ -1,12 +1,4 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
+"use strict";
 // Configuration - Replace with your Ghost instance details
 const config = {
     url: 'http://localhost:2368', // あなたのGhost URLに変更
@@ -25,47 +17,43 @@ class GhostBlog {
     /**
      * Fetch tags from Ghost Content API
      */
-    fetchTags() {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const url = `${this.config.url}/ghost/api/content/tags/?key=${this.config.key}&limit=all&include=count.posts`;
-                const response = yield fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = yield response.json();
-                // Filter tags that have at least one post
-                return data.tags.filter(tag => tag.count && tag.count.posts > 0);
+    async fetchTags() {
+        try {
+            const url = `${this.config.url}/ghost/api/content/tags/?key=${this.config.key}&limit=all&include=count.posts`;
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-            catch (error) {
-                console.error('Error fetching tags:', error);
-                throw error;
-            }
-        });
+            const data = await response.json();
+            // Filter tags that have at least one post
+            return data.tags.filter(tag => tag.count && tag.count.posts > 0);
+        }
+        catch (error) {
+            console.error('Error fetching tags:', error);
+            throw error;
+        }
     }
     /**
      * Fetch posts from Ghost Content API
      */
-    fetchPosts() {
-        return __awaiter(this, arguments, void 0, function* (limit = 12, tagSlug) {
-            try {
-                let url = `${this.config.url}/ghost/api/content/posts/?key=${this.config.key}&limit=${limit}&include=tags,authors&fields=id,title,slug,excerpt,custom_excerpt,feature_image,published_at,reading_time`;
-                // Add tag filter if specified
-                if (tagSlug) {
-                    url += `&filter=tag:${tagSlug}`;
-                }
-                const response = yield fetch(url);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = yield response.json();
-                return data.posts;
+    async fetchPosts(limit = 12, tagSlug) {
+        try {
+            let url = `${this.config.url}/ghost/api/content/posts/?key=${this.config.key}&limit=${limit}&include=tags,authors&fields=id,title,slug,excerpt,custom_excerpt,feature_image,published_at,reading_time`;
+            // Add tag filter if specified
+            if (tagSlug) {
+                url += `&filter=tag:${tagSlug}`;
             }
-            catch (error) {
-                console.error('Error fetching posts:', error);
-                throw error;
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
-        });
+            const data = await response.json();
+            return data.posts;
+        }
+        catch (error) {
+            console.error('Error fetching posts:', error);
+            throw error;
+        }
     }
     /**
      * Format date to Japanese locale
@@ -192,62 +180,58 @@ class GhostBlog {
         if (!this.tagsContainer) {
             return;
         }
-        this.tagsContainer.innerHTML = '';
+        const container = this.tagsContainer;
+        container.innerHTML = '';
         // Add "All" tag
         const allTag = document.createElement('button');
         allTag.className = `tag-filter ${!this.selectedTag ? 'active' : ''}`;
         allTag.textContent = 'すべて';
         allTag.onclick = () => this.filterByTag(null);
-        this.tagsContainer.appendChild(allTag);
+        container.appendChild(allTag);
         // Add individual tags
         tags.forEach(tag => {
-            var _a;
             const tagButton = document.createElement('button');
             tagButton.className = `tag-filter ${this.selectedTag === tag.slug ? 'active' : ''}`;
-            tagButton.textContent = `${tag.name} (${((_a = tag.count) === null || _a === void 0 ? void 0 : _a.posts) || 0})`;
+            tagButton.textContent = `${tag.name} (${tag.count?.posts || 0})`;
             tagButton.onclick = () => this.filterByTag(tag.slug);
-            this.tagsContainer.appendChild(tagButton);
+            container.appendChild(tagButton);
         });
     }
     /**
      * Filter posts by tag
      */
-    filterByTag(tagSlug) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this.selectedTag = tagSlug;
-            try {
-                this.showLoading();
-                const posts = yield this.fetchPosts(12, tagSlug || undefined);
-                const tags = yield this.fetchTags();
-                this.renderTags(tags);
-                this.renderPosts(posts);
-            }
-            catch (error) {
-                console.error('Failed to filter posts:', error);
-                this.showError('投稿のフィルタリングに失敗しました。');
-            }
-        });
+    async filterByTag(tagSlug) {
+        this.selectedTag = tagSlug;
+        try {
+            this.showLoading();
+            const posts = await this.fetchPosts(12, tagSlug || undefined);
+            const tags = await this.fetchTags();
+            this.renderTags(tags);
+            this.renderPosts(posts);
+        }
+        catch (error) {
+            console.error('Failed to filter posts:', error);
+            this.showError('投稿のフィルタリングに失敗しました。');
+        }
     }
     /**
      * Initialize the blog
      */
-    init() {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                this.showLoading();
-                const [posts, tags] = yield Promise.all([
-                    this.fetchPosts(),
-                    this.fetchTags()
-                ]);
-                this.renderTags(tags);
-                this.renderPosts(posts);
-            }
-            catch (error) {
-                console.error('Failed to initialize blog:', error);
-                this.showError('ブログの投稿を読み込めませんでした。設定を確認してください。\n' +
-                    'Ghost URLとContent API Keyが正しいか確認してください。');
-            }
-        });
+    async init() {
+        try {
+            this.showLoading();
+            const [posts, tags] = await Promise.all([
+                this.fetchPosts(),
+                this.fetchTags()
+            ]);
+            this.renderTags(tags);
+            this.renderPosts(posts);
+        }
+        catch (error) {
+            console.error('Failed to initialize blog:', error);
+            this.showError('ブログの投稿を読み込めませんでした。設定を確認してください。\n' +
+                'Ghost URLとContent API Keyが正しいか確認してください。');
+        }
     }
 }
 // Initialize when DOM is ready

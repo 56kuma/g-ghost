@@ -273,14 +273,15 @@ class GhostBlog {
             return;
         }
 
-        this.tagsContainer.innerHTML = '';
+        const container = this.tagsContainer;
+        container.innerHTML = '';
 
         // Add "All" tag
         const allTag = document.createElement('button');
         allTag.className = `tag-filter ${!this.selectedTag ? 'active' : ''}`;
         allTag.textContent = 'すべて';
         allTag.onclick = () => this.filterByTag(null);
-        this.tagsContainer.appendChild(allTag);
+        container.appendChild(allTag);
 
         // Add individual tags
         tags.forEach(tag => {
@@ -288,7 +289,7 @@ class GhostBlog {
             tagButton.className = `tag-filter ${this.selectedTag === tag.slug ? 'active' : ''}`;
             tagButton.textContent = `${tag.name} (${tag.count?.posts || 0})`;
             tagButton.onclick = () => this.filterByTag(tag.slug);
-            this.tagsContainer.appendChild(tagButton);
+            container.appendChild(tagButton);
         });
     }
 
