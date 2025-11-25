@@ -233,3 +233,52 @@ body {
     margin-bottom: 10px;
     color: var(--text-primary);
 }
+
+/* Tags Filter Section */
+.tags-filter-section {
+    margin-bottom: 40px;
+}
+
+.filter-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+}
+
+.tags-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.tag-filter {
+    background-color: var(--card-background);
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    padding: 8px 18px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.tag-filter:hover {
+    border-color: var(--primary-color);
+    background-color: #eff6ff;
+    transform: translateY(-2px);
+}
+
+.tag-filter.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: var(--shadow-md);
+}
+
+.tag-filter.active:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
