@@ -234,8 +234,64 @@ class GhostBlog {
         }
     }
 }
+// Page Navigation Manager
+class PageNavigation {
+    constructor(blog) {
+        this.blogInitialized = false;
+        this.blog = blog;
+        this.navButtons = document.querySelectorAll('.header-nav-btn');
+        this.pageSections = document.querySelectorAll('.page-section');
+        this.initNavigation();
+        this.initCTAButton();
+    }
+    initNavigation() {
+        this.navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const targetPage = button.getAttribute('data-page');
+                if (targetPage) {
+                    this.switchPage(targetPage);
+                }
+            });
+        });
+    }
+    initCTAButton() {
+        const ctaButton = document.getElementById('cta-blog-btn');
+        if (ctaButton) {
+            ctaButton.addEventListener('click', () => {
+                this.switchPage('blog');
+            });
+        }
+    }
+    switchPage(pageId) {
+        // Remove active class from all nav buttons
+        this.navButtons.forEach(button => {
+            button.classList.remove('active');
+        });
+        // Hide all page sections
+        this.pageSections.forEach(section => {
+            section.classList.remove('active');
+            section.style.display = 'none';
+        });
+        // Activate selected nav button
+        const activeButton = document.querySelector(`[data-page="${pageId}"]`);
+        if (activeButton) {
+            activeButton.classList.add('active');
+        }
+        // Show selected page section
+        const activeSection = document.getElementById(`${pageId}-section`);
+        if (activeSection) {
+            activeSection.style.display = 'block';
+            activeSection.classList.add('active');
+        }
+        // Initialize blog if switching to blog page for the first time
+        if (pageId === 'blog' && !this.blogInitialized) {
+            this.blog.init();
+            this.blogInitialized = true;
+        }
+    }
+}
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     const blog = new GhostBlog(config);
-    blog.init();
+    const navigation = new PageNavigation(blog);
 });
