@@ -8,34 +8,119 @@
 </head>
 <body>
     <header class="header">
-        <div class="container">
-            <h1 class="header-title">Ghost CMS Blog</h1>
-            <p class="header-subtitle">ヘッドレスCMSで構築されたモダンなブログ</p>
+        <div class="container header-content">
+            <div class="header-text">
+                <h1 class="header-title">Ghost CMS Blog</h1>
+                <p class="header-subtitle">ヘッドレスCMSで構築されたモダンなブログ</p>
+            </div>
+            <nav class="header-nav">
+                <button id="nav-home" class="header-nav-btn active" data-page="home">
+                    Home
+                </button>
+                <button id="nav-blog" class="header-nav-btn" data-page="blog">
+                    Blog
+                </button>
+            </nav>
         </div>
     </header>
 
     <main class="main">
         <div class="container">
-            <div id="loading" class="loading">
-                <div class="spinner"></div>
-                <p>投稿を読み込んでいます...</p>
-            </div>
+            <!-- Home Section -->
+            <section id="home-section" class="page-section active">
+                <div class="home-content">
+                    <div class="profile-card">
+                        <div class="profile-header">
+                            <div class="profile-avatar">
+                                <div class="avatar-placeholder">👨‍💻</div>
+                            </div>
+                            <div class="profile-intro">
+                                <h2 class="profile-title">自己紹介</h2>
+                                <p class="profile-subtitle">About Me</p>
+                            </div>
+                        </div>
 
-            <div id="error" class="error" style="display: none;">
-                <p class="error-message"></p>
-            </div>
+                        <div class="profile-content">
+                            <div class="profile-section">
+                                <h3 class="section-title">基本情報</h3>
+                                <div class="info-grid">
+                                    <div class="info-item">
+                                        <span class="info-icon">👤</span>
+                                        <div class="info-text">
+                                            <div class="info-label">年齢</div>
+                                            <div class="info-value">35歳 社会人</div>
+                                        </div>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-icon">💼</span>
+                                        <div class="info-text">
+                                            <div class="info-label">職種</div>
+                                            <div class="info-value">ソフトウェアエンジニア</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-            <!-- Tag Filter Section -->
-            <div class="tags-filter-section">
-                <h3 class="filter-title">タグで絞り込む</h3>
-                <div id="tags-container" class="tags-filter">
-                    <!-- Tags will be dynamically inserted here -->
+                            <div class="profile-section">
+                                <h3 class="section-title">趣味</h3>
+                                <div class="hobbies-grid">
+                                    <div class="hobby-card">
+                                        <div class="hobby-icon">⚽</div>
+                                        <h4 class="hobby-title">サッカー</h4>
+                                        <p class="hobby-description">試合観戦やプレーを楽しんでいます</p>
+                                    </div>
+                                    <div class="hobby-card">
+                                        <div class="hobby-icon">🥅</div>
+                                        <h4 class="hobby-title">フットサル</h4>
+                                        <p class="hobby-description">仲間と定期的にプレーしています</p>
+                                    </div>
+                                    <div class="hobby-card">
+                                        <div class="hobby-icon">📚</div>
+                                        <h4 class="hobby-title">読書</h4>
+                                        <p class="hobby-description">漫画を中心に幅広く読んでいます</p>
+                                    </div>
+                                    <div class="hobby-card">
+                                        <div class="hobby-icon">🥬</div>
+                                        <h4 class="hobby-title">野菜作り</h4>
+                                        <p class="hobby-description">家庭菜園で季節の野菜を育てています</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="profile-section">
+                                <div class="cta-section">
+                                    <p class="cta-text">技術的な記事やその他の情報はBlogをご覧ください</p>
+                                    <button id="cta-blog-btn" class="cta-button">Blogを見る</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </section>
 
-            <div id="posts-container" class="posts-grid">
-                <!-- Posts will be dynamically inserted here -->
-            </div>
+            <!-- Blog Section -->
+            <section id="blog-section" class="page-section" style="display: none;">
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    <p>投稿を読み込んでいます...</p>
+                </div>
+
+                <div id="error" class="error" style="display: none;">
+                    <p class="error-message"></p>
+                </div>
+
+                <!-- Tag Filter Section -->
+                <div class="tags-filter-section">
+                    <h3 class="filter-title">タグで絞り込む</h3>
+                    <div id="tags-container" class="tags-filter">
+                        <!-- Tags will be dynamically inserted here -->
+                    </div>
+                </div>
+
+                <div id="posts-container" class="posts-grid">
+                    <!-- Posts will be dynamically inserted here -->
+                </div>
+            </section>
         </div>
     </main>
 
