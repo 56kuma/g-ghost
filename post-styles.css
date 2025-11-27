@@ -200,6 +200,57 @@
     color: var(--earth-secondary);
 }
 
+/* Ghost Callouts */
+.post-content .gh-callout,
+.post-content .kg-callout {
+    padding: 20px 24px;
+    margin: 2em 0;
+    border-radius: 12px;
+    border-left: 4px solid;
+    background-color: var(--earth-sand);
+    font-style: normal;
+}
+
+.post-content .gh-callout-text,
+.post-content .kg-callout-text {
+    color: var(--earth-brown-dark);
+}
+
+/* Callout Emoji */
+.post-content .gh-callout-emoji,
+.post-content .kg-callout-emoji {
+    font-size: 1.3em;
+    margin-right: 0.5em;
+}
+
+/* Callout Types - Info (Blue/Primary) */
+.post-content .gh-callout-info,
+.post-content .kg-callout-info {
+    background-color: rgba(139, 115, 85, 0.08);
+    border-left-color: var(--earth-primary);
+}
+
+/* Callout Types - Success (Green/Olive) */
+.post-content .gh-callout-success,
+.post-content .kg-callout-success {
+    background-color: rgba(107, 123, 58, 0.08);
+    border-left-color: var(--earth-olive);
+}
+
+/* Callout Types - Warning (Orange/Terracotta) */
+.post-content .gh-callout-warning,
+.post-content .kg-callout-warning {
+    background-color: rgba(198, 123, 92, 0.08);
+    border-left-color: var(--earth-terracotta);
+}
+
+/* Callout Types - Danger (Red/Accent) */
+.post-content .gh-callout-danger,
+.post-content .kg-callout-danger {
+    background-color: rgba(160, 82, 45, 0.08);
+    border-left-color: var(--earth-accent);
+}
+
 .post-content code {
     background-color: var(--earth-beige);
     padding: 2px 8px;

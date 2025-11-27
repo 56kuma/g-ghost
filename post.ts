@@ -40,7 +40,7 @@ class PostPage {
 
     async fetchPost(slug: string): Promise<GhostPost | null> {
         try {
-            const url = `${this.config.url}/ghost/api/content/posts/slug/${slug}/?key=${this.config.key}&include=tags,authors`;
+            const url = `${this.config.url}/ghost/api/content/posts/slug/${slug}/?key=${this.config.key}&include=tags,authors&fields=id,title,slug,html,feature_image,published_at,reading_time,custom_excerpt,excerpt`;
             const response = await fetch(url);
 
             if (!response.ok) {
