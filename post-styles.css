@@ -253,6 +253,116 @@
     opacity: 0.8;
 }
 
+/* Ghost Callout Card Styles */
+.kg-callout-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 20px 24px;
+    border-radius: 12px;
+    margin: 2em 0;
+    border-left: 4px solid;
+    background-color: var(--earth-sand);
+    border-color: var(--earth-primary);
+}
+
+.kg-callout-emoji {
+    font-size: 1.5rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.kg-callout-text {
+    flex: 1;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--earth-brown-dark);
+}
+
+/* Callout Color Variants */
+.kg-callout-card-blue {
+    background-color: #E3F2FD;
+    border-color: #2196F3;
+}
+
+.kg-callout-card-blue .kg-callout-text {
+    color: #0D47A1;
+}
+
+.kg-callout-card-green {
+    background-color: #E8F5E9;
+    border-color: #4CAF50;
+}
+
+.kg-callout-card-green .kg-callout-text {
+    color: #1B5E20;
+}
+
+.kg-callout-card-yellow {
+    background-color: #FFF9E6;
+    border-color: #FFC107;
+}
+
+.kg-callout-card-yellow .kg-callout-text {
+    color: #7A5C00;
+}
+
+.kg-callout-card-red {
+    background-color: #FFEBEE;
+    border-color: #F44336;
+}
+
+.kg-callout-card-red .kg-callout-text {
+    color: #B71C1C;
+}
+
+.kg-callout-card-pink {
+    background-color: #FCE4EC;
+    border-color: #E91E63;
+}
+
+.kg-callout-card-pink .kg-callout-text {
+    color: #880E4F;
+}
+
+.kg-callout-card-purple {
+    background-color: #F3E5F5;
+    border-color: #9C27B0;
+}
+
+.kg-callout-card-purple .kg-callout-text {
+    color: #4A148C;
+}
+
+.kg-callout-card-grey,
+.kg-callout-card-gray {
+    background-color: var(--earth-beige);
+    border-color: var(--earth-secondary);
+}
+
+.kg-callout-card-grey .kg-callout-text,
+.kg-callout-card-gray .kg-callout-text {
+    color: var(--earth-brown-dark);
+}
+
+.kg-callout-card-white {
+    background-color: #ffffff;
+    border-color: var(--earth-light);
+}
+
+.kg-callout-card-white .kg-callout-text {
+    color: var(--earth-brown-dark);
+}
+
+.kg-callout-card-accent {
+    background-color: #FFF5F0;
+    border-color: var(--earth-terracotta);
+}
+
+.kg-callout-card-accent .kg-callout-text {
+    color: var(--earth-brown-dark);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .post-hero {
@@ -277,5 +387,14 @@
 
     .post-content h2 {
         font-size: 1.5rem;
+    }
+
+    .kg-callout-card {
+        gap: 12px;
+        padding: 16px 20px;
+    }
+
+    .kg-callout-emoji {
+        font-size: 1.2rem;
     }
 }
