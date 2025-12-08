@@ -25,6 +25,13 @@ interface GhostAPIResponse {
     posts: GhostPost[];
 }
 
+interface TocItem {
+    id: string;
+    text: string;
+    level: number;
+    element: HTMLElement;
+}
+
 const config: GhostConfig = {
     url: 'http://localhost:2368',
     key: '691bd2d288c7e2579ff1c4865a',
@@ -33,6 +40,8 @@ const config: GhostConfig = {
 
 class PostPage {
     private config: GhostConfig;
+    private tocItems: TocItem[] = [];
+    private activeId: string | null = null;
 
     constructor(config: GhostConfig) {
         this.config = config;
@@ -114,7 +123,12 @@ class PostPage {
         const contentEl = document.getElementById('post-html');
         if (contentEl) {
             contentEl.innerHTML = post.html;
+            console.log('[PostPage] Post content inserted into DOM');
         }
+
+        // Generate table of contents
+        console.log('[PostPage] Calling generateTableOfContents()...');
+        this.generateTableOfContents();
 
         // Show article
         const articleEl = document.getElementById('post-content');
@@ -126,6 +140,153 @@ class PostPage {
         const loadingEl = document.getElementById('loading');
         if (loadingEl) {
             loadingEl.style.display = 'none';
+        }
+
+        // Setup scroll spy
+        this.setupScrollSpy();
+    }
+
+    generateTableOfContents(): void {
+        console.log('[TOC] Starting table of contents generation...');
+
+        const contentEl = document.getElementById('post-html');
+        const tocNav = document.getElementById('toc-nav');
+        const tocSidebar = document.getElementById('toc-sidebar');
+
+        console.log('[TOC] contentEl:', contentEl ? 'found' : 'NOT FOUND');
+        console.log('[TOC] tocNav:', tocNav ? 'found' : 'NOT FOUND');
+        console.log('[TOC] tocSidebar:', tocSidebar ? 'found' : 'NOT FOUND');
+
+        if (!contentEl) {
+            console.error('[TOC] Content element not found');
+            return;
+        }
+        if (!tocNav) {
+            console.error('[TOC] TOC nav element not found');
+            return;
+        }
+
+        // Clear initial loading text
+        tocNav.innerHTML = '';
+
+        console.log('[TOC] Elements found successfully, cleared initial content');
+
+        // Find all headings (h1, h2, h3, h4)
+        const headings = contentEl.querySelectorAll('h1, h2, h3, h4');
+        console.log(`[TOC] Found ${headings.length} headings`);
+
+        if (headings.length === 0) {
+            console.log('[TOC] No headings found, showing message');
+            // Show TOC with a message instead of hiding it
+            const tocSidebar = document.getElementById('toc-sidebar');
+            if (tocSidebar) {
+                tocNav.innerHTML = '<p style="color: var(--earth-primary); font-size: 0.9rem; padding: 12px;">この記事には見出しがありません</p>';
+            }
+            return;
+        }
+
+        this.tocItems = [];
+        const tocList = document.createElement('ul');
+        tocList.className = 'toc-list';
+
+        headings.forEach((heading, index) => {
+            const headingEl = heading as HTMLElement;
+            const level = parseInt(headingEl.tagName.substring(1)); // h2 -> 2, h3 -> 3
+            const text = headingEl.textContent || '';
+
+            // Generate unique ID for heading
+            const id = `heading-${index}`;
+            headingEl.id = id;
+
+            // Create TOC item
+            const tocItem: TocItem = {
+                id,
+                text,
+                level,
+                element: headingEl
+            };
+            this.tocItems.push(tocItem);
+
+            // Create TOC link
+            const listItem = document.createElement('li');
+            listItem.className = `toc-item toc-level-${level}`;
+
+            const link = document.createElement('a');
+            link.href = `#${id}`;
+            link.textContent = text;
+            link.className = 'toc-link';
+            link.dataset.id = id;
+
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                headingEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Update active state
+                this.setActiveLink(id);
+            });
+
+            listItem.appendChild(link);
+            tocList.appendChild(listItem);
+        });
+
+        tocNav.appendChild(tocList);
+        console.log(`[TOC] Table of contents generated successfully with ${this.tocItems.length} items`);
+    }
+
+    setupScrollSpy(): void {
+        let ticking = false;
+
+        const onScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    this.updateActiveLink();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        // Initial update
+        this.updateActiveLink();
+    }
+
+    updateActiveLink(): void {
+        const scrollPosition = window.scrollY + 100; // Offset for header
+
+        let currentId: string | null = null;
+
+        // Find the current heading based on scroll position
+        for (let i = this.tocItems.length - 1; i >= 0; i--) {
+            const item = this.tocItems[i];
+            const offsetTop = item.element.offsetTop;
+
+            if (scrollPosition >= offsetTop) {
+                currentId = item.id;
+                break;
+            }
+        }
+
+        // Update active state if changed
+        if (currentId !== this.activeId) {
+            this.setActiveLink(currentId);
+        }
+    }
+
+    setActiveLink(id: string | null): void {
+        this.activeId = id;
+
+        // Remove all active states
+        const allLinks = document.querySelectorAll('.toc-link');
+        allLinks.forEach(link => {
+            link.classList.remove('active');
+        });
+
+        // Add active state to current link
+        if (id) {
+            const activeLink = document.querySelector(`.toc-link[data-id="${id}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
         }
     }
 
@@ -146,16 +307,21 @@ class PostPage {
     }
 
     async init(): Promise<void> {
+        console.log('=== PostPage init() called ===');
         const params = new URLSearchParams(window.location.search);
         const slug = params.get('slug');
+        console.log('[PostPage] slug:', slug);
 
         if (!slug) {
+            console.error('[PostPage] No slug found in URL');
             this.showError('記事が見つかりませんでした。');
             return;
         }
 
         try {
+            console.log('[PostPage] Fetching post...');
             const post = await this.fetchPost(slug);
+            console.log('[PostPage] Post fetched:', post ? 'success' : 'null');
             if (post) {
                 this.renderPost(post);
             } else {
@@ -168,7 +334,13 @@ class PostPage {
     }
 }
 
+console.log('=== post.js loaded ===');
+
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('=== DOMContentLoaded event fired ===');
     const page = new PostPage(config);
+    console.log('=== PostPage instance created, calling init() ===');
     page.init();
 });
+
+export {};

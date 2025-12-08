@@ -14,6 +14,6 @@
     "allowJs": true,
     "noEmit": false
   },
-  "include": ["main.ts"],
+  "include": ["main.ts", "post.ts"],
   "exclude": ["node_modules"]
 }

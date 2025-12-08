@@ -1,4 +1,3 @@
-"use strict";
 // Configuration - Replace with your Ghost instance details
 const config = {
     url: 'http://localhost:2368', // あなたのGhost URLに変更
@@ -77,8 +76,11 @@ class GhostBlog {
         };
         // Feature image or placeholder
         const imageUrl = post.feature_image || 'https://via.placeholder.com/400x220/667eea/ffffff?text=No+Image';
-        // Excerpt
-        const excerpt = post.custom_excerpt || post.excerpt || 'この投稿には抜粋がありません。';
+        // Excerpt (60文字まで)
+        let excerpt = post.custom_excerpt || post.excerpt || 'この投稿には抜粋がありません。';
+        if (excerpt.length > 60) {
+            excerpt = excerpt.substring(0, 60) + '...';
+        }
         // Tags
         const tagsHTML = post.tags && post.tags.length > 0
             ? post.tags.slice(0, 3).map(tag => `<span class="post-card-tag">${this.escapeHtml(tag.name)}</span>`).join('')
@@ -253,6 +255,14 @@ class PageNavigation {
                 }
             });
         });
+        // Check URL hash on page load
+        this.checkUrlHash();
+    }
+    checkUrlHash() {
+        const hash = window.location.hash.substring(1); // Remove '#' from hash
+        if (hash && hash === 'blog') {
+            this.switchPage('blog');
+        }
     }
     initCTAButton() {
         const ctaButton = document.getElementById('cta-blog-btn');
@@ -295,3 +305,4 @@ document.addEventListener('DOMContentLoaded', () => {
     const blog = new GhostBlog(config);
     const navigation = new PageNavigation(blog);
 });
+export {};

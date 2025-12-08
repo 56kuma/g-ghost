@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>記事 | Ghost CMS Blog</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="post-styles.css">
+    <link rel="stylesheet" href="styles.css?v=3">
+    <link rel="stylesheet" href="post-styles.css?v=3">
 </head>
 <body class="post-page">
     <header class="post-header">
         <div class="container">
-            <a href="index.html" class="back-link">← ブログに戻る</a>
+            <a href="index.html#blog" class="back-link">← ブログに戻る</a>
         </div>
     </header>
 
@@ -33,6 +33,17 @@
                     <div id="post-tags" class="post-tags"></div>
                     <h1 id="post-title" class="post-title"></h1>
                     <div id="post-meta" class="post-meta"></div>
+
+                    <!-- Table of Contents - Before Content -->
+                    <aside id="toc-sidebar" class="toc-sidebar">
+                        <div class="toc-wrapper">
+                            <h3 class="toc-title">目次</h3>
+                            <nav id="toc-nav" class="toc-nav">
+                                <p style="color: var(--earth-primary); font-size: 0.9rem;">読み込み中...</p>
+                            </nav>
+                        </div>
+                    </aside>
+
                     <div id="post-html" class="post-content"></div>
                 </div>
             </article>
@@ -45,6 +56,6 @@
         </div>
     </footer>
 
-    <script src="post.js"></script>
+    <script type="module" src="post.js?v=3"></script>
 </body>
 </html>

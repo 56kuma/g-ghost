@@ -1,50 +1,30 @@
-"use strict";
-// Configuration - Replace with your Ghost instance details
+// Ghost CMS Post Detail Page
 const config = {
     url: 'http://localhost:2368',
     key: '691bd2d288c7e2579ff1c4865a',
     version: 'v5.0'
 };
-
-class GhostPost {
+class PostPage {
     constructor(config) {
+        this.tocItems = [];
+        this.activeId = null;
         this.config = config;
-        this.loadingElement = document.getElementById('loading');
-        this.errorElement = document.getElementById('error');
-        this.postContent = document.getElementById('post-content');
     }
-
-    /**
-     * Get slug from URL query parameters
-     */
-    getSlugFromUrl() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get('slug');
-    }
-
-    /**
-     * Fetch a single post by slug from Ghost Content API
-     */
     async fetchPost(slug) {
         try {
             const url = `${this.config.url}/ghost/api/content/posts/slug/${slug}/?key=${this.config.key}&include=tags,authors`;
             const response = await fetch(url);
-
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
             const data = await response.json();
-            return data.posts[0];
-        } catch (error) {
+            return data.posts[0] || null;
+        }
+        catch (error) {
             console.error('Error fetching post:', error);
             throw error;
         }
     }
-
-    /**
-     * Format date to Japanese locale
-     */
     formatDate(dateString) {
         const date = new Date(dateString);
         return new Intl.DateTimeFormat('ja-JP', {
@@ -53,158 +33,227 @@ class GhostPost {
             day: 'numeric'
         }).format(date);
     }
-
-    /**
-     * Escape HTML to prevent XSS
-     */
     escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
-
-    /**
-     * Show loading state
-     */
-    showLoading() {
-        if (this.loadingElement) {
-            this.loadingElement.style.display = 'block';
-        }
-        if (this.errorElement) {
-            this.errorElement.style.display = 'none';
-        }
-        if (this.postContent) {
-            this.postContent.style.display = 'none';
-        }
-    }
-
-    /**
-     * Hide loading state
-     */
-    hideLoading() {
-        if (this.loadingElement) {
-            this.loadingElement.style.display = 'none';
-        }
-    }
-
-    /**
-     * Show error message
-     */
-    showError(message) {
-        this.hideLoading();
-        if (this.errorElement) {
-            this.errorElement.style.display = 'block';
-            const errorMessage = this.errorElement.querySelector('.error-message');
-            if (errorMessage) {
-                errorMessage.textContent = message;
-            }
-        }
-        if (this.postContent) {
-            this.postContent.style.display = 'none';
-        }
-    }
-
-    /**
-     * Render post to the page
-     */
     renderPost(post) {
-        if (!this.postContent) {
-            console.error('Post content container not found');
-            return;
-        }
-
-        this.hideLoading();
-
-        // Set page title
+        // Update title
         document.title = `${post.title} | Ghost CMS Blog`;
-
-        // Feature image
-        const postImage = document.getElementById('post-image');
-        if (postImage) {
-            if (post.feature_image) {
-                postImage.src = post.feature_image;
-                postImage.alt = post.title;
-                postImage.parentElement.style.display = 'block';
-            } else {
-                postImage.parentElement.style.display = 'none';
-            }
+        // Image
+        const imageEl = document.getElementById('post-image');
+        if (imageEl) {
+            imageEl.src = post.feature_image || 'https://via.placeholder.com/900x400/8B7355/ffffff?text=No+Image';
+            imageEl.alt = post.title;
         }
-
         // Tags
-        const postTags = document.getElementById('post-tags');
-        if (postTags && post.tags && post.tags.length > 0) {
-            postTags.innerHTML = post.tags
-                .map(tag => `<span class="post-tag">${this.escapeHtml(tag.name)}</span>`)
-                .join('');
+        const tagsEl = document.getElementById('post-tags');
+        if (tagsEl && post.tags && post.tags.length > 0) {
+            tagsEl.innerHTML = post.tags.map(tag => `<span class="post-tag">${this.escapeHtml(tag.name)}</span>`).join('');
         }
-
         // Title
-        const postTitle = document.getElementById('post-title');
-        if (postTitle) {
-            postTitle.textContent = post.title;
+        const titleEl = document.getElementById('post-title');
+        if (titleEl) {
+            titleEl.textContent = post.title;
         }
-
-        // Meta information
-        const postMeta = document.getElementById('post-meta');
-        if (postMeta) {
+        // Meta
+        const metaEl = document.getElementById('post-meta');
+        if (metaEl) {
             const authorName = post.authors && post.authors.length > 0
                 ? post.authors[0].name
                 : 'Unknown Author';
             const readingTime = post.reading_time || 1;
-
-            postMeta.innerHTML = `
-                <div class="post-author">
-                    <span class="author-name">${this.escapeHtml(authorName)}</span>
-                </div>
-                <div class="post-date">${this.formatDate(post.published_at)}</div>
-                <div class="post-reading-time">📖 ${readingTime}分で読めます</div>
+            metaEl.innerHTML = `
+                <span class="post-author">${this.escapeHtml(authorName)}</span>
+                <span class="post-date">${this.formatDate(post.published_at)}</span>
+                <span class="post-reading-time">📖 ${readingTime}分で読めます</span>
             `;
         }
-
-        // Post HTML content
-        const postHtml = document.getElementById('post-html');
-        if (postHtml && post.html) {
-            postHtml.innerHTML = post.html;
+        // Content
+        const contentEl = document.getElementById('post-html');
+        if (contentEl) {
+            contentEl.innerHTML = post.html;
+            console.log('[PostPage] Post content inserted into DOM');
         }
-
-        // Show the post
-        this.postContent.style.display = 'block';
+        // Generate table of contents
+        console.log('[PostPage] Calling generateTableOfContents()...');
+        this.generateTableOfContents();
+        // Show article
+        const articleEl = document.getElementById('post-content');
+        if (articleEl) {
+            articleEl.style.display = 'block';
+        }
+        // Hide loading
+        const loadingEl = document.getElementById('loading');
+        if (loadingEl) {
+            loadingEl.style.display = 'none';
+        }
+        // Setup scroll spy
+        this.setupScrollSpy();
     }
-
-    /**
-     * Initialize the post page
-     */
+    generateTableOfContents() {
+        console.log('[TOC] Starting table of contents generation...');
+        const contentEl = document.getElementById('post-html');
+        const tocNav = document.getElementById('toc-nav');
+        const tocSidebar = document.getElementById('toc-sidebar');
+        console.log('[TOC] contentEl:', contentEl ? 'found' : 'NOT FOUND');
+        console.log('[TOC] tocNav:', tocNav ? 'found' : 'NOT FOUND');
+        console.log('[TOC] tocSidebar:', tocSidebar ? 'found' : 'NOT FOUND');
+        if (!contentEl) {
+            console.error('[TOC] Content element not found');
+            return;
+        }
+        if (!tocNav) {
+            console.error('[TOC] TOC nav element not found');
+            return;
+        }
+        // Clear initial loading text
+        tocNav.innerHTML = '';
+        console.log('[TOC] Elements found successfully, cleared initial content');
+        // Find all headings (h1, h2, h3, h4)
+        const headings = contentEl.querySelectorAll('h1, h2, h3, h4');
+        console.log(`[TOC] Found ${headings.length} headings`);
+        if (headings.length === 0) {
+            console.log('[TOC] No headings found, showing message');
+            // Show TOC with a message instead of hiding it
+            const tocSidebar = document.getElementById('toc-sidebar');
+            if (tocSidebar) {
+                tocNav.innerHTML = '<p style="color: var(--earth-primary); font-size: 0.9rem; padding: 12px;">この記事には見出しがありません</p>';
+            }
+            return;
+        }
+        this.tocItems = [];
+        const tocList = document.createElement('ul');
+        tocList.className = 'toc-list';
+        headings.forEach((heading, index) => {
+            const headingEl = heading;
+            const level = parseInt(headingEl.tagName.substring(1)); // h2 -> 2, h3 -> 3
+            const text = headingEl.textContent || '';
+            // Generate unique ID for heading
+            const id = `heading-${index}`;
+            headingEl.id = id;
+            // Create TOC item
+            const tocItem = {
+                id,
+                text,
+                level,
+                element: headingEl
+            };
+            this.tocItems.push(tocItem);
+            // Create TOC link
+            const listItem = document.createElement('li');
+            listItem.className = `toc-item toc-level-${level}`;
+            const link = document.createElement('a');
+            link.href = `#${id}`;
+            link.textContent = text;
+            link.className = 'toc-link';
+            link.dataset.id = id;
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                headingEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Update active state
+                this.setActiveLink(id);
+            });
+            listItem.appendChild(link);
+            tocList.appendChild(listItem);
+        });
+        tocNav.appendChild(tocList);
+        console.log(`[TOC] Table of contents generated successfully with ${this.tocItems.length} items`);
+    }
+    setupScrollSpy() {
+        let ticking = false;
+        const onScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    this.updateActiveLink();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+        window.addEventListener('scroll', onScroll, { passive: true });
+        // Initial update
+        this.updateActiveLink();
+    }
+    updateActiveLink() {
+        const scrollPosition = window.scrollY + 100; // Offset for header
+        let currentId = null;
+        // Find the current heading based on scroll position
+        for (let i = this.tocItems.length - 1; i >= 0; i--) {
+            const item = this.tocItems[i];
+            const offsetTop = item.element.offsetTop;
+            if (scrollPosition >= offsetTop) {
+                currentId = item.id;
+                break;
+            }
+        }
+        // Update active state if changed
+        if (currentId !== this.activeId) {
+            this.setActiveLink(currentId);
+        }
+    }
+    setActiveLink(id) {
+        this.activeId = id;
+        // Remove all active states
+        const allLinks = document.querySelectorAll('.toc-link');
+        allLinks.forEach(link => {
+            link.classList.remove('active');
+        });
+        // Add active state to current link
+        if (id) {
+            const activeLink = document.querySelector(`.toc-link[data-id="${id}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
+        }
+    }
+    showError(message) {
+        const loadingEl = document.getElementById('loading');
+        if (loadingEl) {
+            loadingEl.style.display = 'none';
+        }
+        const errorEl = document.getElementById('error');
+        if (errorEl) {
+            errorEl.style.display = 'block';
+            const errorMessage = errorEl.querySelector('.error-message');
+            if (errorMessage) {
+                errorMessage.textContent = message;
+            }
+        }
+    }
     async init() {
+        console.log('=== PostPage init() called ===');
+        const params = new URLSearchParams(window.location.search);
+        const slug = params.get('slug');
+        console.log('[PostPage] slug:', slug);
+        if (!slug) {
+            console.error('[PostPage] No slug found in URL');
+            this.showError('記事が見つかりませんでした。');
+            return;
+        }
         try {
-            this.showLoading();
-
-            // Get slug from URL
-            const slug = this.getSlugFromUrl();
-
-            if (!slug) {
-                throw new Error('記事のslugが見つかりません');
-            }
-
-            // Fetch and render post
+            console.log('[PostPage] Fetching post...');
             const post = await this.fetchPost(slug);
-
-            if (!post) {
-                throw new Error('記事が見つかりませんでした');
+            console.log('[PostPage] Post fetched:', post ? 'success' : 'null');
+            if (post) {
+                this.renderPost(post);
             }
-
-            this.renderPost(post);
-        } catch (error) {
+            else {
+                this.showError('記事が見つかりませんでした。');
+            }
+        }
+        catch (error) {
             console.error('Failed to load post:', error);
-            this.showError(
-                '記事を読み込めませんでした。\n' +
-                'URLが正しいか、または記事が存在するか確認してください。'
-            );
+            this.showError('記事の読み込みに失敗しました。');
         }
     }
 }
-
-// Initialize when DOM is ready
+console.log('=== post.js loaded ===');
 document.addEventListener('DOMContentLoaded', () => {
-    const post = new GhostPost(config);
-    post.init();
+    console.log('=== DOMContentLoaded event fired ===');
+    const page = new PostPage(config);
+    console.log('=== PostPage instance created, calling init() ===');
+    page.init();
 });
+export {};
