@@ -76,8 +76,11 @@ class GhostBlog {
         };
         // Feature image or placeholder
         const imageUrl = post.feature_image || 'https://via.placeholder.com/400x220/667eea/ffffff?text=No+Image';
-        // Excerpt
-        const excerpt = post.custom_excerpt || post.excerpt || 'この投稿には抜粋がありません。';
+        // Excerpt (60文字まで)
+        let excerpt = post.custom_excerpt || post.excerpt || 'この投稿には抜粋がありません。';
+        if (excerpt.length > 60) {
+            excerpt = excerpt.substring(0, 60) + '...';
+        }
         // Tags
         const tagsHTML = post.tags && post.tags.length > 0
             ? post.tags.slice(0, 3).map(tag => `<span class="post-card-tag">${this.escapeHtml(tag.name)}</span>`).join('')
