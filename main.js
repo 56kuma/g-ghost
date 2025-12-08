@@ -255,6 +255,14 @@ class PageNavigation {
                 }
             });
         });
+        // Check URL hash on page load
+        this.checkUrlHash();
+    }
+    checkUrlHash() {
+        const hash = window.location.hash.substring(1); // Remove '#' from hash
+        if (hash && hash === 'blog') {
+            this.switchPage('blog');
+        }
     }
     initCTAButton() {
         const ctaButton = document.getElementById('cta-blog-btn');
