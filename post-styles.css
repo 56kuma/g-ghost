@@ -73,18 +73,11 @@
     object-fit: cover;
 }
 
-/* Post Body Wrapper */
-.post-body-wrapper {
-    display: flex;
-    gap: 48px;
-    position: relative;
-}
-
 /* Post Body */
 .post-body {
-    flex: 1;
-    min-width: 0;
     padding: 48px;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 /* Post Tags */
@@ -250,22 +243,24 @@
     margin: 3em 0;
 }
 
-/* Table of Contents Sidebar */
+/* Table of Contents - Before Content */
 .toc-sidebar {
-    width: 280px;
-    flex-shrink: 0;
-    padding: 48px 48px 48px 0;
+    width: 100%;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    margin: 32px 0;
 }
 
 .toc-wrapper {
-    position: sticky;
-    top: 80px;
-    max-height: calc(100vh - 160px);
-    overflow-y: auto;
-    padding: 24px;
+    padding: 24px 32px;
     background-color: var(--earth-sand);
     border-radius: 12px;
-    border: 2px solid var(--earth-beige);
+    border: 3px solid var(--earth-primary);
+    box-shadow: 0 4px 12px rgba(74, 55, 40, 0.2);
+    display: block !important;
+    visibility: visible !important;
+    min-height: 80px;
 }
 
 .toc-title {
@@ -470,20 +465,20 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-    .toc-sidebar {
-        display: none;
-    }
-
     .post-article {
-        max-width: 900px;
-    }
-
-    .post-body-wrapper {
-        display: block;
+        max-width: 100%;
     }
 
     .post-body {
-        padding: 48px;
+        padding: 32px;
+    }
+
+    .toc-sidebar {
+        margin: 24px 0;
+    }
+
+    .toc-wrapper {
+        padding: 20px 24px;
     }
 }
 
@@ -493,7 +488,7 @@
     }
 
     .post-body {
-        padding: 24px;
+        padding: 20px;
     }
 
     .post-title {
@@ -502,6 +497,23 @@
 
     .post-meta {
         gap: 16px;
+    }
+
+    .toc-sidebar {
+        margin: 20px 0;
+    }
+
+    .toc-wrapper {
+        padding: 16px 20px;
+    }
+
+    .toc-title {
+        font-size: 1rem;
+    }
+
+    .toc-link {
+        font-size: 0.85rem;
+        padding: 5px 10px;
     }
 
     .post-content {

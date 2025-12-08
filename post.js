@@ -74,8 +74,10 @@ class PostPage {
         const contentEl = document.getElementById('post-html');
         if (contentEl) {
             contentEl.innerHTML = post.html;
+            console.log('[PostPage] Post content inserted into DOM');
         }
         // Generate table of contents
+        console.log('[PostPage] Calling generateTableOfContents()...');
         this.generateTableOfContents();
         // Show article
         const articleEl = document.getElementById('post-content');
@@ -91,17 +93,33 @@ class PostPage {
         this.setupScrollSpy();
     }
     generateTableOfContents() {
+        console.log('[TOC] Starting table of contents generation...');
         const contentEl = document.getElementById('post-html');
         const tocNav = document.getElementById('toc-nav');
-        if (!contentEl || !tocNav)
+        const tocSidebar = document.getElementById('toc-sidebar');
+        console.log('[TOC] contentEl:', contentEl ? 'found' : 'NOT FOUND');
+        console.log('[TOC] tocNav:', tocNav ? 'found' : 'NOT FOUND');
+        console.log('[TOC] tocSidebar:', tocSidebar ? 'found' : 'NOT FOUND');
+        if (!contentEl) {
+            console.error('[TOC] Content element not found');
             return;
-        // Find all headings (h2, h3, h4)
-        const headings = contentEl.querySelectorAll('h2, h3, h4');
+        }
+        if (!tocNav) {
+            console.error('[TOC] TOC nav element not found');
+            return;
+        }
+        // Clear initial loading text
+        tocNav.innerHTML = '';
+        console.log('[TOC] Elements found successfully, cleared initial content');
+        // Find all headings (h1, h2, h3, h4)
+        const headings = contentEl.querySelectorAll('h1, h2, h3, h4');
+        console.log(`[TOC] Found ${headings.length} headings`);
         if (headings.length === 0) {
-            // Hide TOC if no headings
+            console.log('[TOC] No headings found, showing message');
+            // Show TOC with a message instead of hiding it
             const tocSidebar = document.getElementById('toc-sidebar');
             if (tocSidebar) {
-                tocSidebar.style.display = 'none';
+                tocNav.innerHTML = '<p style="color: var(--earth-primary); font-size: 0.9rem; padding: 12px;">この記事には見出しがありません</p>';
             }
             return;
         }
@@ -141,6 +159,7 @@ class PostPage {
             tocList.appendChild(listItem);
         });
         tocNav.appendChild(tocList);
+        console.log(`[TOC] Table of contents generated successfully with ${this.tocItems.length} items`);
     }
     setupScrollSpy() {
         let ticking = false;
@@ -204,14 +223,19 @@ class PostPage {
         }
     }
     async init() {
+        console.log('=== PostPage init() called ===');
         const params = new URLSearchParams(window.location.search);
         const slug = params.get('slug');
+        console.log('[PostPage] slug:', slug);
         if (!slug) {
+            console.error('[PostPage] No slug found in URL');
             this.showError('記事が見つかりませんでした。');
             return;
         }
         try {
+            console.log('[PostPage] Fetching post...');
             const post = await this.fetchPost(slug);
+            console.log('[PostPage] Post fetched:', post ? 'success' : 'null');
             if (post) {
                 this.renderPost(post);
             }
@@ -225,8 +249,11 @@ class PostPage {
         }
     }
 }
+console.log('=== post.js loaded ===');
 document.addEventListener('DOMContentLoaded', () => {
+    console.log('=== DOMContentLoaded event fired ===');
     const page = new PostPage(config);
+    console.log('=== PostPage instance created, calling init() ===');
     page.init();
 });
 export {};
