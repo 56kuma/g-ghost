@@ -1,4 +1,3 @@
-"use strict";
 // Configuration - Replace with your Ghost instance details
 const config = {
     url: 'http://localhost:2368', // あなたのGhost URLに変更
@@ -295,3 +294,4 @@ document.addEventListener('DOMContentLoaded', () => {
     const blog = new GhostBlog(config);
     const navigation = new PageNavigation(blog);
 });
+export {};

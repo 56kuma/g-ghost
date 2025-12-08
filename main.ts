@@ -406,3 +406,5 @@ document.addEventListener('DOMContentLoaded', () => {
     const blog = new GhostBlog(config);
     const navigation = new PageNavigation(blog);
 });
+
+export {};

@@ -25,6 +25,13 @@ interface GhostAPIResponse {
     posts: GhostPost[];
 }
 
+interface TocItem {
+    id: string;
+    text: string;
+    level: number;
+    element: HTMLElement;
+}
+
 const config: GhostConfig = {
     url: 'http://localhost:2368',
     key: '691bd2d288c7e2579ff1c4865a',
@@ -33,6 +40,8 @@ const config: GhostConfig = {
 
 class PostPage {
     private config: GhostConfig;
+    private tocItems: TocItem[] = [];
+    private activeId: string | null = null;
 
     constructor(config: GhostConfig) {
         this.config = config;
@@ -116,6 +125,9 @@ class PostPage {
             contentEl.innerHTML = post.html;
         }
 
+        // Generate table of contents
+        this.generateTableOfContents();
+
         // Show article
         const articleEl = document.getElementById('post-content');
         if (articleEl) {
@@ -126,6 +138,131 @@ class PostPage {
         const loadingEl = document.getElementById('loading');
         if (loadingEl) {
             loadingEl.style.display = 'none';
+        }
+
+        // Setup scroll spy
+        this.setupScrollSpy();
+    }
+
+    generateTableOfContents(): void {
+        const contentEl = document.getElementById('post-html');
+        const tocNav = document.getElementById('toc-nav');
+
+        if (!contentEl || !tocNav) return;
+
+        // Find all headings (h2, h3, h4)
+        const headings = contentEl.querySelectorAll('h2, h3, h4');
+
+        if (headings.length === 0) {
+            // Hide TOC if no headings
+            const tocSidebar = document.getElementById('toc-sidebar');
+            if (tocSidebar) {
+                tocSidebar.style.display = 'none';
+            }
+            return;
+        }
+
+        this.tocItems = [];
+        const tocList = document.createElement('ul');
+        tocList.className = 'toc-list';
+
+        headings.forEach((heading, index) => {
+            const headingEl = heading as HTMLElement;
+            const level = parseInt(headingEl.tagName.substring(1)); // h2 -> 2, h3 -> 3
+            const text = headingEl.textContent || '';
+
+            // Generate unique ID for heading
+            const id = `heading-${index}`;
+            headingEl.id = id;
+
+            // Create TOC item
+            const tocItem: TocItem = {
+                id,
+                text,
+                level,
+                element: headingEl
+            };
+            this.tocItems.push(tocItem);
+
+            // Create TOC link
+            const listItem = document.createElement('li');
+            listItem.className = `toc-item toc-level-${level}`;
+
+            const link = document.createElement('a');
+            link.href = `#${id}`;
+            link.textContent = text;
+            link.className = 'toc-link';
+            link.dataset.id = id;
+
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                headingEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Update active state
+                this.setActiveLink(id);
+            });
+
+            listItem.appendChild(link);
+            tocList.appendChild(listItem);
+        });
+
+        tocNav.appendChild(tocList);
+    }
+
+    setupScrollSpy(): void {
+        let ticking = false;
+
+        const onScroll = () => {
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    this.updateActiveLink();
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        // Initial update
+        this.updateActiveLink();
+    }
+
+    updateActiveLink(): void {
+        const scrollPosition = window.scrollY + 100; // Offset for header
+
+        let currentId: string | null = null;
+
+        // Find the current heading based on scroll position
+        for (let i = this.tocItems.length - 1; i >= 0; i--) {
+            const item = this.tocItems[i];
+            const offsetTop = item.element.offsetTop;
+
+            if (scrollPosition >= offsetTop) {
+                currentId = item.id;
+                break;
+            }
+        }
+
+        // Update active state if changed
+        if (currentId !== this.activeId) {
+            this.setActiveLink(currentId);
+        }
+    }
+
+    setActiveLink(id: string | null): void {
+        this.activeId = id;
+
+        // Remove all active states
+        const allLinks = document.querySelectorAll('.toc-link');
+        allLinks.forEach(link => {
+            link.classList.remove('active');
+        });
+
+        // Add active state to current link
+        if (id) {
+            const activeLink = document.querySelector(`.toc-link[data-id="${id}"]`);
+            if (activeLink) {
+                activeLink.classList.add('active');
+            }
         }
     }
 
@@ -172,3 +309,5 @@ document.addEventListener('DOMContentLoaded', () => {
     const page = new PostPage(config);
     page.init();
 });
+
+export {};
