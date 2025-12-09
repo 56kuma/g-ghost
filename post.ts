@@ -81,7 +81,7 @@ class PostPage {
 
     renderPost(post: GhostPost): void {
         // Update title
-        document.title = `${post.title} | Ghost CMS Blog`;
+        document.title = `${post.title} | Masudaily`;
 
         // Image
         const imageEl = document.getElementById('post-image') as HTMLImageElement;

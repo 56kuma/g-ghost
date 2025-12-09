@@ -40,7 +40,7 @@ class PostPage {
     }
     renderPost(post) {
         // Update title
-        document.title = `${post.title} | Ghost CMS Blog`;
+        document.title = `${post.title} | Masudaily`;
         // Image
         const imageEl = document.getElementById('post-image');
         if (imageEl) {
