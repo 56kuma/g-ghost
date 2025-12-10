@@ -149,7 +149,7 @@ chmod +x setup-vps.sh
 
 ```bash
 # Gitリポジトリをクローン
-git clone https://github.com/YOUR_USERNAME/g_ghost.git
+git clone https://github.com/56kuma/g-ghost.git
 cd g_ghost
 
 # 実行権限を付与
@@ -182,11 +182,12 @@ exit
 
 # 再ログイン
 ssh root@160.251.xxx.xxx
+ssh conoha
 ```
 
 ---
 
-### ステップ8: SSL証明書取得
+### ✅ステップ8: SSL証明書取得
 
 **重要: このステップはDNS設定（ステップ4）が伝播した後に実行してください！**
 
