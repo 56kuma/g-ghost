@@ -9,7 +9,7 @@ set -e
 DOMAIN=$1
 
 if [ -z "$DOMAIN" ]; then
-    echo "使い方: ./setup-vps.sh yourdomain.com"
+    echo "使い方: ./setup-vps.sh masudaily.jp"
     exit 1
 fi
 
