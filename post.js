@@ -1,7 +1,7 @@
 // Ghost CMS Post Detail Page
 const config = {
-    url: 'http://localhost:2368',
-    key: '691bd2d288c7e2579ff1c4865a',
+    url: 'https://masudaily.jp',
+    key: 'a7b90e53468acbbe51a0f3ab7d',
     version: 'v5.0'
 };
 class PostPage {

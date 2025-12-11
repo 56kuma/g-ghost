@@ -1,7 +1,7 @@
 // Configuration - Replace with your Ghost instance details
 const config = {
-    url: 'http://localhost:2368', // あなたのGhost URLに変更
-    key: '691bd2d288c7e2579ff1c4865a', // Content API Keyに変更
+    url: 'https://masudaily.jp',
+    key: 'a7b90e53468acbbe51a0f3ab7d',
     version: 'v5.0'
 };
 class GhostBlog {
@@ -255,14 +255,6 @@ class PageNavigation {
                 }
             });
         });
-        // Check URL hash on page load
-        this.checkUrlHash();
-    }
-    checkUrlHash() {
-        const hash = window.location.hash.substring(1); // Remove '#' from hash
-        if (hash && hash === 'blog') {
-            this.switchPage('blog');
-        }
     }
     initCTAButton() {
         const ctaButton = document.getElementById('cta-blog-btn');

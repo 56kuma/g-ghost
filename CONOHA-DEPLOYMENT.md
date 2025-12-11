@@ -243,14 +243,14 @@ Git Bash または WSL を起動して、プロジェクトディレクトリに
 cd /d/g_ghost
 ```
 
-#### 1. 環境変数ファイルを作成
+#### ✅1. 環境変数ファイルを作成
 
 ```bash
 # .env.example を .env にコピー
 cp .env.example .env
 ```
 
-#### 2. .env ファイルを編集
+#### ✅2. .env ファイルを編集
 
 エディタで `.env` を開いて以下を設定:
 
@@ -272,7 +272,7 @@ DB_ROOT_PASSWORD=R00t_Str0ng_P@ssw0rd_2024
 - `My$ecureDB2024!Ghost`
 - 12文字以上、英数字+記号を含む
 
-#### 3. TypeScriptをビルド
+#### ✅3. TypeScriptをビルド
 
 ```bash
 npm run build
@@ -280,7 +280,7 @@ npm run build
 
 成功すると `main.js` と `post.js` が更新されます。
 
-#### 4. デプロイスクリプトに実行権限を付与
+#### ✅4. デプロイスクリプトに実行権限を付与
 
 ```bash
 chmod +x deploy.sh
@@ -289,8 +289,11 @@ chmod +x deploy.sh
 #### 5. デプロイ実行
 
 ```bash
+# ファイルを変換
+dos2unix deploy.sh
+
 # デプロイ実行（IPアドレスは実際のVPSのIPに置き換え）
-./deploy.sh 160.251.xxx.xxx root
+./deploy.sh conoha
 ```
 
 **このスクリプトが自動で実行する内容:**
@@ -318,7 +321,7 @@ chmod +x deploy.sh
 ssh root@160.251.xxx.xxx
 ```
 
-#### 1. Nginx設定ファイルを配置
+#### ✅1. Nginx設定ファイルを配置
 
 ```bash
 # アップロードされた設定ファイルを移動
@@ -332,23 +335,36 @@ sudo sed -i 's/yourdomain.com/actual-domain.com/g' /etc/nginx/sites-available/yo
 **例:** ドメインが `myblog.com` の場合:
 ```bash
 sudo sed -i 's/yourdomain.com/myblog.com/g' /etc/nginx/sites-available/yourdomain.com
+
+# コマンドログ
+sudo sed -i 's/yourdomain.com/masudaily.jp/g' /etc/nginx/sites-available/yourdomain.com
+mv /etc/nginx/sites-available/yourdomain.com /etc/nginx/sites-available/masudaily.jp
+
 ```
 
-#### 2. シンボリックリンクを作成
+#### ✅2. シンボリックリンクを作成
 
 ```bash
 # sites-enabled にシンボリックリンクを作成
-sudo ln -s /etc/nginx/sites-available/yourdomain.com /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/masudaily.jp /etc/nginx/sites-enabled/
 
 # デフォルト設定を無効化
 sudo rm /etc/nginx/sites-enabled/default
 ```
 
-#### 3. Nginx設定をテスト
+#### ✅3. Nginx設定をテスト
 
 ```bash
 # 設定ファイルの構文チェック
 sudo nginx -t
+
+# ここでエラー発生
+sudo certbot certonly --standalone -d masudaily.jp -d www.masudaily.jp
+
+# きもはこれ
+cannot load certificate "/etc/letsencrypt/live/myblog.com/fullchain.pem"
+myblog.com のままになっています！ あなたのドメインは masudaily.jp なので、Nginx設定ファイ ルを修正する必要があります。
+
 ```
 
 成功すると以下のメッセージが表示されます:
@@ -357,7 +373,7 @@ nginx: the configuration file /etc/nginx/nginx.conf syntax is ok
 nginx: configuration file /etc/nginx/nginx.conf test is successful
 ```
 
-#### 4. Nginxをリロード
+#### ✅4. Nginxをリロード
 
 ```bash
 # Nginxを再読み込み
@@ -376,6 +392,8 @@ sudo systemctl status nginx
 ブラウザで以下のURLにアクセス:
 ```
 https://yourdomain.com/ghost
+# こっち
+https://masudaily.jp/ghost
 ```
 
 #### 2. 管理者アカウントを作成
