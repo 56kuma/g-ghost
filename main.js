@@ -1,7 +1,14 @@
 // Configuration - Replace with your Ghost instance details
+// prod
+// const config: GhostConfig = {
+//     url: 'https://masudaily.jp',
+//     key: 'a7b90e53468acbbe51a0f3ab7d',
+//     version: 'v5.0'
+// };
+// dev
 const config = {
-    url: 'https://masudaily.jp',
-    key: 'a7b90e53468acbbe51a0f3ab7d',
+    url: 'http://localhost:2368',
+    key: 'a8adf19a06e952535111ca0081', // ローカルのAPI Keyに変更してください
     version: 'v5.0'
 };
 class GhostBlog {

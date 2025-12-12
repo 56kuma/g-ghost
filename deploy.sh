@@ -14,6 +14,15 @@ echo "VPS: $SSH_HOST"
 echo "リモートディレクトリ: $REMOTE_DIR"
 echo ""
 
+# 本番環境用の.envファイルを確認
+if [ ! -f .env.production ]; then
+    echo "エラー: .env.production ファイルが見つかりません"
+    exit 1
+fi
+
+echo "本番環境用の設定ファイルを使用します: .env.production"
+echo ""
+
 # TypeScriptをビルド
 echo "1. TypeScriptをビルド中..."
 npm run build
@@ -26,7 +35,7 @@ ssh $SSH_HOST "mkdir -p /var/www/blog"
 # Dockerファイルをアップロード
 echo "3. Docker設定ファイルをアップロード中..."
 scp docker-compose.production.yml $SSH_HOST:$REMOTE_DIR/docker-compose.yml
-scp .env $SSH_HOST:$REMOTE_DIR/.env
+scp .env.production $SSH_HOST:$REMOTE_DIR/.env
 
 # フロントエンドファイルをアップロード
 echo "4. フロントエンドファイルをアップロード中..."

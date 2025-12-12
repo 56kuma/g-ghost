@@ -636,4 +636,166 @@ docker-compose restart
 
 ---
 
+## 🔧 開発環境と本番環境の設定
+
+### 設定ファイルの切り替え
+
+開発環境（ローカル）と本番環境（VPS）で異なる設定が必要なファイルの一覧です。
+
+#### 1. **main.ts と post.ts**
+
+フロントエンドのGhost API接続設定
+
+**開発環境（ローカルでGhostを起動する場合）:**
+```typescript
+const config: GhostConfig = {
+    url: 'http://localhost:2368',
+    key: 'ローカルのContent API Key',
+    version: 'v5.0'
+};
+```
+
+**本番環境（masudaily.jp）:**
+```typescript
+const config: GhostConfig = {
+    url: 'https://masudaily.jp',
+    key: 'a7b90e53468acbbe51a0f3ab7d',
+    version: 'v5.0'
+};
+```
+
+**変更後は必ずビルド:**
+```bash
+npm run build
+```
+
+---
+
+#### 2. **.env ファイル**
+
+Ghostコンテナとデータベースの設定
+
+**開発環境:**
+```env
+GHOST_URL=http://localhost:2368
+
+DB_NAME=ghostdb
+DB_USER=ghost
+DB_PASSWORD=開発用パスワード
+DB_ROOT_PASSWORD=開発用ルートパスワード
+```
+
+**本番環境:**
+```env
+GHOST_URL=https://masudaily.jp
+
+DB_NAME=ghostdb
+DB_USER=ghost
+DB_PASSWORD=本番用強力パスワード
+DB_ROOT_PASSWORD=本番用強力ルートパスワード
+```
+
+---
+
+#### 3. **nginx.conf**
+
+Nginx Web サーバーの設定
+
+**開発環境:**
+- ローカルではNginxを使わず、直接 `http://localhost:2368` でGhostにアクセス
+- または `nginx.conf` のテスト用に localhost で設定
+
+**本番環境:**
+```nginx
+server_name masudaily.jp www.masudaily.jp;
+ssl_certificate /etc/letsencrypt/live/masudaily.jp/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/masudaily.jp/privkey.pem;
+```
+
+---
+
+### 環境切り替えのワークフロー
+
+#### 開発環境で作業する場合
+
+1. **main.ts / post.ts を開発環境用に変更**
+   ```typescript
+   url: 'http://localhost:2368'
+   key: 'ローカルのAPI Key'
+   ```
+
+2. **ローカルでGhostを起動**
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **ブラウザで確認**
+   - Ghost管理画面: `http://localhost:2368/ghost`
+   - フロントエンド: ファイルを直接開く or ローカルサーバー起動
+
+#### 本番環境にデプロイする場合
+
+1. **main.ts / post.ts を本番環境用に変更**
+   ```typescript
+   url: 'https://masudaily.jp'
+   key: 'a7b90e53468acbbe51a0f3ab7d'
+   ```
+
+2. **ビルド**
+   ```bash
+   npm run build
+   ```
+
+3. **デプロイ**
+   ```bash
+   ./deploy.sh conoha
+   # または
+   scp main.js post.js root@IPアドレス:/var/www/blog/
+   ```
+
+4. **ブラウザで確認**
+   - Ghost管理画面: `https://masudaily.jp/ghost`
+   - フロントエンド: `https://masudaily.jp`
+
+---
+
+### Content API Keyの取得方法
+
+新しい環境でGhostをセットアップした場合、Content API Keyを取得する必要があります。
+
+1. Ghost管理画面にログイン
+   - 開発: `http://localhost:2368/ghost`
+   - 本番: `https://masudaily.jp/ghost`
+
+2. **Settings** → **Integrations** をクリック
+
+3. **Add custom integration** をクリック
+
+4. 統合名を入力（例: `Blog Frontend`）
+
+5. **Create** をクリック
+
+6. **Content API Key** をコピーして、`main.ts` と `post.ts` に貼り付け
+
+---
+
+## 💡 Tips
+
+### .gitignoreの活用
+
+機密情報をGitにコミットしないために、`.gitignore` に以下が含まれています：
+
+```
+.env          # データベースパスワードなど
+node_modules/
+*.log
+dist/
+```
+
+**注意:**
+- `main.ts` と `post.ts` のAPI Keyは読み取り専用なので、コミットしてもセキュリティリスクは低いです
+- ただし、プライベートリポジトリ推奨
+
+---
+
 **お疲れ様でした！楽しいブログライフを！** 🎉
