@@ -1,16 +1,16 @@
 // Ghost CMS Post Detail Page
 // Prod
-// const config: GhostConfig = {
-//     url: 'https://masudaily.jp',
-//     key: 'a7b90e53468acbbe51a0f3ab7d',
-//     version: 'v5.0'
-// };
-// Dev
 const config = {
-    url: 'http://localhost:2368',
-    key: 'a8adf19a06e952535111ca0081', // ローカルのAPI Keyに変更してください
+    url: 'https://masudaily.jp',
+    key: 'a7b90e53468acbbe51a0f3ab7d',
     version: 'v5.0'
 };
+// Dev
+// const config: GhostConfig = {
+//     url: 'http://localhost:2368',
+//     key: 'a8adf19a06e952535111ca0081',  // ローカルのAPI Keyに変更してください
+//     version: 'v5.0'
+// };
 class PostPage {
     constructor(config) {
         this.tocItems = [];

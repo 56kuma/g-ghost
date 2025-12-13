@@ -1,16 +1,16 @@
 // Configuration - Replace with your Ghost instance details
 // prod
-// const config: GhostConfig = {
-//     url: 'https://masudaily.jp',
-//     key: 'a7b90e53468acbbe51a0f3ab7d',
-//     version: 'v5.0'
-// };
-// dev
 const config = {
-    url: 'http://localhost:2368',
-    key: 'a8adf19a06e952535111ca0081', // ローカルのAPI Keyに変更してください
+    url: 'https://masudaily.jp',
+    key: 'a7b90e53468acbbe51a0f3ab7d',
     version: 'v5.0'
 };
+// dev
+// const config: GhostConfig = {
+//     url: 'http://localhost:2368',
+//     key: 'a8adf19a06e952535111ca0081',  // ローカルのAPI Keyに変更してください
+//     version: 'v5.0'
+// };
 class GhostBlog {
     constructor(config) {
         this.selectedTag = null;
@@ -252,6 +252,7 @@ class PageNavigation {
         this.pageSections = document.querySelectorAll('.page-section');
         this.initNavigation();
         this.initCTAButton();
+        this.initHashNavigation();
     }
     initNavigation() {
         this.navButtons.forEach(button => {
@@ -269,6 +270,21 @@ class PageNavigation {
             ctaButton.addEventListener('click', () => {
                 this.switchPage('blog');
             });
+        }
+    }
+    initHashNavigation() {
+        // ハッシュ変更を監視
+        window.addEventListener('hashchange', () => {
+            this.handleHashChange();
+        });
+        // ページロード時にもハッシュをチェック
+        this.handleHashChange();
+    }
+    handleHashChange() {
+        const hash = window.location.hash.slice(1); // '#blog' -> 'blog'
+        // ハッシュがある場合、対応するページに切り替え
+        if (hash) {
+            this.switchPage(hash);
         }
     }
     switchPage(pageId) {
