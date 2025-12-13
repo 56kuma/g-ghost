@@ -18,11 +18,14 @@ services:
       # Ghost設定（本番環境）
       url: ${GHOST_URL}
       NODE_ENV: production
-      # メール設定（オプション - 必要に応じて設定）
-      # mail__transport: SMTP
-      # mail__options__service: Gmail
-      # mail__options__auth__user: ${MAIL_USER}
-      # mail__options__auth__pass: ${MAIL_PASSWORD}
+      # メール設定（Resend使用）
+      mail__transport: SMTP
+      mail__options__host: smtp.resend.com
+      mail__options__port: 465
+      mail__options__secure: true
+      mail__options__auth__user: resend
+      mail__options__auth__pass: ${RESEND_API_KEY}
+      mail__from: ${MAIL_FROM}
     volumes:
       - ghost_content:/var/lib/ghost/content
     depends_on:
